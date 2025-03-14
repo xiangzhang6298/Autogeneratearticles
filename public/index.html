@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World</title>
+</head>
+<body>
+    <h1>Hello World</h1>
+    <p>欢迎来到 Hello World 网页前端！</p>
+    <button id="runTest">运行 test.ts</button>
+    <a href="/api-page" id="apiPageLink">API 页面</a>
+    <script>
+        document.getElementById('runTest').addEventListener('click', () => {
+            fetch('/src/test.ts')
+                .then(response => response.text())
+                .then(code => {
+                    eval(code);
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
