@@ -6,7 +6,8 @@
     "start": "nodemon src/index.ts",
     "build": "tsc && npm run copy-templates",
     "test": "nodemon src/test.ts",
-    "copy-templates": "copyfiles -u 1 \"src/templates/**/*\" dist"
+    "copy-templates": "copyfiles -u 1 \"src/templates/**/*\" dist",
+    "web": "nodemon ./src/server.ts"
   },
   "author": "",
   "license": "ISC",

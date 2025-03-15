@@ -103,7 +103,7 @@ export class WeixinWorkflow {
     }
   }
 
-  async process(): Promise<void> {
+  async process(): Promise<{ status: string; message: string; filePath: string; }> {
     try {
       console.log("=== 开始执行微信工作流 ===");
       await this.notifier.info("工作流开始", "开始执行内容抓取和处理");
@@ -167,7 +167,11 @@ export class WeixinWorkflow {
         const message = "未获取到任何内容";
         console.error(`[工作流] ${message}`);
         await this.notifier.error("工作流终止", message);
-        return;
+        return {
+          status: "error",
+          message: "未获取到任何内容",
+          filePath: "",
+        };
       }
 
       // 3. 内容处理
@@ -255,10 +259,17 @@ export class WeixinWorkflow {
       // 保存到本地文件
       console.log("保存到本地文件...");
       const fileName = `Weixin_Article_${format(new Date(), "yyyyMMdd")}.html`;
-      const filePath = path.join(__dirname, "../output", fileName);
+      const filePath = path.join(__dirname, "../../articles", fileName);
       const renderedTemplate = this.renderer.render(templateData);
       fs.writeFileSync(filePath, renderedTemplate, "utf-8");
       console.log(`内容已保存到本地文件: ${filePath}`);
+
+      // 返回保存成功的结果
+      return {
+        status: "success",
+        message: "文件生成成功",
+        filePath: filePath,
+      };
 
       //生成图片
       // const taskId = await this.imageGenerator

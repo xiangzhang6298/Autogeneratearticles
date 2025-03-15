@@ -1,24 +1,162 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>首页</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    header, footer {
+      width: 100%;
+      font-size: 16px !important; /* 确保文字大小固定 */
+    }
+    header {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    header nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+    }
+    .nav-links a {
+      margin-left: 15px;
+      text-decoration: none;
+      color: #007bff;
+      padding: 5px 10px;
+      border: 1px solid transparent;
+      border-radius: 5px;
+    }
+    .nav-links a:hover {
+      border-color: #007bff;
+      background-color: #f8f9fa;
+    }
+    footer {
+      background-color: #fff;
+      padding: 10px;
+      text-align: center;
+      border-top: 1px solid #ddd;
+    }
+    footer p {
+      margin: 0;
+      font-size: 14px !important; /* 确保页脚文字大小固定 */
+      color: #6c757d;
+    }
+    .content-container {
+      flex: 1;
+    }
+    .content-container.centered {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    header img {
+      font-size: 16px !important; /* 确保 logo 的字体大小固定 */
+    }
+  </style>
 </head>
 <body>
-    <h1>Hello World</h1>
-    <p>欢迎来到 Hello World 网页前端！</p>
-    <button id="runTest">运行 test.ts</button>
-    <a href="/api-page" id="apiPageLink">API 页面</a>
-    <script>
-        document.getElementById('runTest').addEventListener('click', () => {
-            fetch('/src/test.ts')
-                .then(response => response.text())
-                .then(code => {
-                    eval(code);
-                })
-                .catch(error => console.error('Error:', error));
+  <div id="headerContainer"></div>
+  <div class="content-container" id="contentContainer" style="padding-top: 60px; padding-bottom: 60px;">
+    <!-- 动态加载内容 -->
+    <div id="homeContent">
+      <h1>欢迎来到首页</h1>
+    </div>
+  </div>
+  <div id="footerContainer"></div>
+  <script>
+    const contentContainer = document.getElementById('contentContainer');
+    const homeLink = document.getElementById('homeLink');
+    const articlesLink = document.getElementById('articlesLink');
+    const aboutLink = document.getElementById('aboutLink'); // 新增关于按钮
+
+    // 动态加载页眉和页脚
+    async function loadHeaderAndFooter() {
+      try {
+        const [headerResponse, footerResponse] = await Promise.all([
+          fetch('/header.html'),
+          fetch('/footer.html')
+        ]);
+        const headerHtml = await headerResponse.text();
+        const footerHtml = await footerResponse.text();
+        document.getElementById('headerContainer').innerHTML = headerHtml;
+        document.getElementById('footerContainer').innerHTML = footerHtml;
+
+        // 重新绑定导航栏事件
+        document.getElementById('homeLink').addEventListener('click', (event) => {
+          event.preventDefault();
+          loadHomeContent();
         });
-    </script>
+        document.getElementById('articlesLink').addEventListener('click', (event) => {
+          event.preventDefault();
+          loadArticlesContent();
+        });
+        document.getElementById('aboutLink').addEventListener('click', (event) => {
+          event.preventDefault();
+          loadAboutContent();
+        });
+      } catch (error) {
+        console.error('加载页眉或页脚失败:', error);
+      }
+    }
+
+    // 加载首页内容
+    function loadHomeContent() {
+      contentContainer.classList.add('centered');
+      contentContainer.innerHTML = `
+        <div id="homeContent">
+          <h1>欢迎来到首页</h1>
+        </div>
+      `;
+    }
+
+    // 加载文章页面内容
+    async function loadArticlesContent() {
+      try {
+        const response = await fetch('/articles.html');
+        const articlesHtml = await response.text();
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = articlesHtml;
+        const mainContent = tempDiv.querySelector('body')?.innerHTML || articlesHtml;
+        contentContainer.classList.remove('centered');
+        contentContainer.innerHTML = mainContent;
+      } catch (error) {
+        console.error('加载文章页面失败:', error);
+        contentContainer.innerHTML = `<p>加载文章页面失败，请稍后重试。</p>`;
+      }
+    }
+
+    // 加载关于页面内容
+    async function loadAboutContent() {
+      try {
+        const response = await fetch('/about.html');
+        const aboutHtml = await response.text();
+        contentContainer.classList.remove('centered');
+        contentContainer.innerHTML = aboutHtml;
+      } catch (error) {
+        console.error('加载关于页面失败:', error);
+        contentContainer.innerHTML = `<p>加载关于页面失败，请稍后重试。</p>`;
+      }
+    }
+
+    // 初始化页面
+    loadHeaderAndFooter().then(loadHomeContent);
+  </script>
 </body>
 </html>

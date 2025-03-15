@@ -1,10 +1,11 @@
-import { WeixinWorkflow } from "./services/weixin-article.workflow";
-import { ConfigManager } from "./utils/config/config-manager";
-import { EnvConfigSource } from "./utils/config/sources/env-config.source";
-import { DbConfigSource } from "./utils/config/sources/db-config.source";
-import { MySQLDB } from "./utils/db/mysql.db";
-import { WeixinAIBenchWorkflow } from "./services/weixin-aibench.workflow";
-import { WeixinHelloGithubWorkflow } from "./services/weixin-hellogithub.workflow";
+const { WeixinWorkflow } = require("./services/weixin-article.workflow");
+const { ConfigManager } = require("./utils/config/config-manager");
+const { EnvConfigSource } = require("./utils/config/sources/env-config.source");
+const { DbConfigSource } = require("./utils/config/sources/db-config.source");
+const { MySQLDB } = require("./utils/db/mysql.db");
+const { WeixinAIBenchWorkflow } = require("./services/weixin-aibench.workflow");
+const { WeixinHelloGithubWorkflow } = require("./services/weixin-hellogithub.workflow");
+import express, { Request, Response } from "express";
 async function bootstrap() {
   const configManager = ConfigManager.getInstance();
   configManager.addSource(new EnvConfigSource());

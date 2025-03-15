@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章列表</title>
+  <style>
+    .articles-page {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .articles-page table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    .articles-page th, .articles-page td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    .articles-page th {
+      background-color: #f2f2f2;
+    }
+    .articles-page .search-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+    .articles-page .search-container input {
+      padding: 5px;
+      font-size: 14px;
+    }
+    .articles-page .search-container button {
+      padding: 5px 10px;
+      font-size: 14px;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body class="articles-page">
+  <div id="headerContainer"></div>
+  <div class="content-container" id="contentContainer" style="padding-top: 60px; padding-bottom: 60px;">
+    <div class="search-container">
+      <input type="text" id="keywordInput" placeholder="请输入关键词">
+      <button id="searchButton">搜索</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>分类</th>
+          <th>标题</th>
+          <th>日期</th>
+          <th>修改</th>
+        </tr>
+      </thead>
+      <tbody id="articlesTableBody">
+        <!-- 动态加载文章数据 -->
+      </tbody>
+    </table>
+  </div>
+  <div id="footerContainer"></div>
+  <script>
+    // 动态加载页眉和页脚
+    async function loadHeaderAndFooter() {
+      try {
+        const [headerResponse, footerResponse] = await Promise.all([
+          fetch('/header.html'),
+          fetch('/footer.html')
+        ]);
+        const headerHtml = await headerResponse.text();
+        const footerHtml = await footerResponse.text();
+        document.getElementById('headerContainer').innerHTML = headerHtml;
+        document.getElementById('footerContainer').innerHTML = footerHtml;
+
+        // 重新绑定导航栏事件
+        document.getElementById('homeLink').addEventListener('click', (event) => {
+          event.preventDefault();
+          window.location.href = '/index.html';
+        });
+        document.getElementById('articlesLink').addEventListener('click', (event) => {
+          event.preventDefault();
+          window.location.href = '/articles.html';
+        });
+        document.getElementById('aboutLink').addEventListener('click', (event) => {
+          event.preventDefault();
+          window.location.href = '/about.html';
+        });
+      } catch (error) {
+        console.error('加载页眉或页脚失败:', error);
+      }
+    }
+
+    // 初始化页面
+    loadHeaderAndFooter();
+
+    // 搜索功能
+    document.getElementById('searchButton').addEventListener('click', async () => {
+      const keyword = document.getElementById('keywordInput').value;
+      try {
+        const response = await fetch(`/api/articles?keyword=${encodeURIComponent(keyword)}`);
+        const articles = await response.json();
+        const tableBody = document.getElementById('articlesTableBody');
+        tableBody.innerHTML = ''; // 清空表格内容
+        articles.forEach(article => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${article.id}</td>
+            <td>${article.category}</td>
+            <td>${article.title}</td>
+            <td>${article.date}</td>
+            <td>
+              <button onclick="editArticle('${article.id}')">修改</button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('查询失败:', error);
+        alert('查询失败，请检查控制台日志。');
+      }
+    });
+
+    async function editArticle(id) {
+      alert(`修改文章 ID: ${id}`);
+      // 在这里实现修改文章的逻辑
+    }
+  </script>
+</body>
+</html>
